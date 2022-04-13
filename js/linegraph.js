@@ -10,8 +10,8 @@ $(document).ready(function(){
         var hum_arr = [];        
   
         for(var i in data) {
-            if(i%4 == 0){
-            date.push("UserID " + data[i].time);
+            if(i%2 == 0){
+            date.push(data[i].time);
             temp_arr.push(data[i].temperature);
             hum_arr.push(data[i].humidity);
             }

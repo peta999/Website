@@ -13,10 +13,172 @@
     <div class="chart-container">
       <canvas id="mycanvas"></canvas>
     </div>
+    <div class="select-date">
+      <select id="select-day" onchange="newDate()"></select>
+      <select id="select-month" onchange="newDate()">
+          <option value="0">January
+          <option value="1">February
+          <option value="2">March
+          <option value="3">April
+          <option value="4">May
+          <option value="5">June
+          <option value="6">July
+          <option value="7">August
+          <option value="8">September
+          <option value="9">October
+          <option value="10">November
+          <option value="11">December
+      </select>
+      <select id="select-year" onchange="newDate()"></select>
+    </div>
     
     <!-- javascript -->
     <script type="text/javascript" src="js/jquery.min.js"></script>
     <script type="text/javascript" src="js/chart.min.js"></script>
-    <script type="text/javascript" src="js/linegraph.js"></script>
+    <!--<script type="text/javascript" src="js/linegraph.js"></script>-->
+    <script type="text/javascript" src="js/test.js"></script>
+    <script>
+      
+      var LineGraph
+      // this will be send to php to execute a query with this date
+      var selectDay = document.getElementById('select-day');
+      var valueDay = selectDay.options[selectDay.selectedIndex].value;
+
+      var selectMonth = document.getElementById('select-month');
+      var valueMonth = selectMonth.options[selectMonth.selectedIndex].value;
+      var numberValue = Number(valueMonth) + 1;
+      valueMonth = String(numberValue); 
+
+
+      var selectYear = document.getElementById('select-year');
+      var valueYear = selectYear.options[selectYear.selectedIndex].value;
+       
+
+      
+
+      date = valueYear + "-" + valueMonth + "-" + valueDay + " 00:00:00"
+      var form_data = new FormData();
+
+      form_data.append('date', date);
+
+      var ajax_request = new XMLHttpRequest();
+
+      ajax_request.open('POST', 'test.php');
+
+      ajax_request.send(form_data);
+
+      ajax_request.onreadystatechange = function()
+      {
+        if(ajax_request.readyState == 4 && ajax_request.status == 200)
+        {
+          var data = JSON.parse(ajax_request.responseText);
+          console.log(data);
+
+          var date = [];
+          var temp_arr = [];
+          var hum_arr = [];
+          
+
+          for(var i in data) {
+              if(i%2 == 0){
+              date.push(data[i].time);
+              temp_arr.push(data[i].temperature);
+              hum_arr.push(data[i].humidity);
+              }
+          }
+    
+          var chartdata = {
+            labels: date,
+            datasets: [
+              {
+                label: "temperature",
+                fill: false,
+                lineTension: 0.1,
+                backgroundColor: "rgba(59, 89, 152, 0.75)",
+                borderColor: "rgba(59, 89, 152, 1)",
+                pointHoverBackgroundColor: "rgba(59, 89, 152, 1)",
+                pointHoverBorderColor: "rgba(59, 89, 152, 1)",
+                data: temp_arr
+              },
+              {
+                label: "humidity",
+                fill: false,
+                lineTension: 0.1,
+                backgroundColor: "rgba(29, 202, 255, 0.75)",
+                borderColor: "rgba(29, 202, 255, 1)",
+                pointHoverBackgroundColor: "rgba(29, 202, 255, 1)",
+                pointHoverBorderColor: "rgba(29, 202, 255, 1)",
+                data: hum_arr
+              }            
+            ]
+          };
+          
+          var ctx = $("#mycanvas");
+    
+          LineGraph = new Chart(ctx, {
+            type: 'line',
+            data: chartdata
+          });         
+                
+        }
+
+      }
+
+
+      function newDate(){
+        // this will be send to php to execute a query with this date
+        var selectDay = document.getElementById('select-day');
+        var valueDay = selectDay.options[selectDay.selectedIndex].value;
+
+        var selectMonth = document.getElementById('select-month');
+        var valueMonth = selectMonth.options[selectMonth.selectedIndex].value;
+        var numberValue = Number(valueMonth) + 1;
+        valueMonth = String(numberValue);
+
+        var selectYear = document.getElementById('select-year');
+        var valueYear = selectYear.options[selectYear.selectedIndex].value;
+
+        
+
+        date = valueYear + "-" + valueMonth + "-" + valueDay + " 00:00:00"
+
+        var form_data = new FormData();
+
+        form_data.append('date', date);
+
+        var ajax_request = new XMLHttpRequest();
+
+        ajax_request.open('POST', 'test.php');
+
+        ajax_request.send(form_data);
+
+        ajax_request.onreadystatechange = function()
+        {
+          if(ajax_request.readyState == 4 && ajax_request.status == 200)
+          {
+            var data = JSON.parse(ajax_request.responseText);
+            
+            var date = [];
+            var temp_arr = [];
+            var hum_arr = [];        
+  
+            for(var i in data) {
+                if(i%2 == 0){
+                date.push(data[i].time);
+                temp_arr.push(data[i].temperature);
+                hum_arr.push(data[i].humidity);
+                }
+            }
+            
+            LineGraph.data.labels = date;
+            LineGraph.data.datasets[0].data = temp_arr;
+            LineGraph.data.datasets[1].data = hum_arr;
+            console.log(LineGraph.data.datasets[0].data); 
+            LineGraph.update();
+          }
+        }
+      }
+    </script>
   </body>
 </html>
+
