@@ -4,7 +4,7 @@
 
 if(isset($_POST["date"]))
 {
-	$connect = new PDO("mysql:host=192.168.2.80:3306; dbname=gewaechshaus", "sqluser", "password");
+	$connect = new PDO("mysql:host=localhost; dbname=gewaechshaus", "sqluser", "password");
 
 	$data = array();
 
